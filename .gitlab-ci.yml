@@ -1,0 +1,78 @@
+stages:
+    - update_cache
+    - compare_commits
+    - tests
+    - run
+
+# we use single runner "docker0"
+default:
+  tags:
+    - docker0
+
+cache: 
+#  policy: pull
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - venv
+    - .cache/pip
+
+update_cache:
+  image: python:3.8-slim-buster
+  before_script:
+    - ''
+#  cache:
+#    key: ${CI_COMMIT_REF_SLUG}
+#    policy: push
+  stage: update_cache
+  script:
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install pytest
+    - pip install pydantic
+    - pip install nornir-cli
+  only:
+    - schedules
+
+compare_commits:
+  stage: compare_commits
+#  variables: 
+#    DIFF: git diff --name-only HEAD~1 | sed '/.py\|.gitlab/d'
+  script:
+    - git checkout HEAD~1
+    - mkdir -p previous
+    - git diff --name-only origin/master
+    - cp --parents $(git diff --name-only origin/master | sed '/.py\|.gitlab/d') previous
+    - ls previous
+  artifacts:
+    paths:
+    - previous
+  except:
+    - schedules
+
+tests:
+  stage: tests
+  image: python:3.8-buster
+  script:
+    - source venv/bin/activate
+    - echo "START SOME TESTS"
+    - pytest --tb=short --disable-warnings -s
+  except:
+    - schedules
+
+
+run:
+  image: python:3.8-buster
+  before_script:
+    - source venv/bin/activate
+  needs: ["tests"]
+#  cache:
+#    policy: pull-push
+  stage: run
+  script:
+    - python stupid_ci.py
+  when: manual
+  allow_failure: false
+  except:
+    - schedules

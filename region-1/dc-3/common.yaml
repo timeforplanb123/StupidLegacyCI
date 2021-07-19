@@ -1,0 +1,27 @@
+filter: "F(device_role__name__contains='access') & F(data__site__name__contains='dc-3')"
+
+configs:
+    snmp:
+      params:
+        snmp_acl: ["2001", "2001"]
+        snmp_version: ["v2c v3"]
+        snmp_trap_address: ["10.1.2.3", "10.1.2.3"]
+
+      commands:
+        # compare configs
+        compare_script: ""
+        no_commands:
+          - []
+          - ["undo snmp-agent sys-info version {}"]
+          - ["undo snmp-agent target-host trap address udp-domain {} params securityname cipher snmp",
+             "undo snmp-agent target-host trap address udp-domain {} params securityname snmp"]
+        yes_commands:
+           - ["snmp-agent community read cipher snmp mib-view SNMP acl {}",
+              "snmp-agent group v3 snmp privacy read-view SNMP notify-view SNMP acl {}"]
+           - ["snmp-agent sys-info version {}"]
+           - ["snmp-agent target-host trap address udp-domain {} params securityname cipher snmp v2c",
+              "snmp-agent target-host trap address udp-domain {} params securityname snmp v3 privacy"]
+        # delete configs
+        delete_commands: ["undo snmp"]
+        # deploy commands (List with commands or path to task)
+        config_commands: "cmd_configure_snmp.py"

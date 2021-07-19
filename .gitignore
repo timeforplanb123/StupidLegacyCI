@@ -1,0 +1,13 @@
+.nornir.log
+
+*.swp
+region*/*.swp
+region*/**/.swp
+
+__pycache__
+region*/__pycache__
+region*/**/__pycache__
+
+*swo
+region*/*.swo
+region*/**.swo

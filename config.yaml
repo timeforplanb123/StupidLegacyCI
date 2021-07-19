@@ -1,0 +1,10 @@
+inventory:
+    plugin: NetBoxInventory2 
+    options:
+        nb_url:
+        nb_token:
+        ssl_verify:
+        runner:
+            plugin: threaded
+            options:
+              num_workers: 100

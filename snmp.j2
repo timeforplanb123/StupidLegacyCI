@@ -1,0 +1,19 @@
+# for v3 only
+snmp-agent
+snmp-agent community read cipher snmp mib-view SNMP acl {{ host.snmp_acl[0] }}
+snmp-agent community complexity-check disable
+snmp-agent sys-info location {{ host.name }}
+snmp-agent sys-info version {{ host.snmp_version | join(' ') }}
+snmp-agent group v3 snmp privacy read-view SNMP notify-view SNMP acl {{ host.snmp_acl[1] }}
+snmp-agent mib-view included SNMP iso
+snmp-agent usm-user v3 snmp
+snmp-agent usm-user v3 snmp group snmp
+snmp-agent usm-user v3 snmp authentication-mode sha
+SNMP
+SNMP
+snmp-agent usm-user v3 snmp privacy-mode aes128
+SNMP
+SNMP
+q
+save
+Y

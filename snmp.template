@@ -1,0 +1,8 @@
+Value List SNMP_ACL (\d{4})
+Value List SNMP_VERSION (\w+ \w+|\w+)
+Value List SNMP_TRAP_ADDRESS (\d+(.\d+){3})
+
+Start
+  ^.*SNMP acl ${SNMP_ACL}
+  ^.*version ${SNMP_VERSION}
+  ^.*trap address udp-domain ${SNMP_TRAP_ADDRESS}.*
